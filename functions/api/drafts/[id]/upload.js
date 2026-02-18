@@ -1,6 +1,6 @@
-import { getDraftById, updateDraft, getTikTokAuth } from '../../../_lib/db.js';
-import { getValidAccessToken, createTikTokPhotoDraft } from '../../../_lib/tiktok.js';
-import { uploadImageFromUrl, makeMediaKey } from '../../../_lib/r2.js';
+import { getDraftById, updateDraft, getTikTokAuth } from '../../_lib/db.js';
+import { getValidAccessToken, createTikTokPhotoDraft } from '../../_lib/tiktok.js';
+import { uploadImageFromUrl, makeMediaKey } from '../../_lib/r2.js';
 
 const BASE_MEDIA_URL = 'https://nonfictionfooty-site.pages.dev/media';
 
