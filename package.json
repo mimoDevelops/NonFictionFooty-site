@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "set-d1-id": "node scripts/set-d1-id.js"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -17,6 +18,6 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
     "vite": "^5.0.0",
-    "wrangler": "^3.19.0"
+    "wrangler": "^4.66.0"
   }
 }

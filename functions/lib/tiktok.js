@@ -4,7 +4,7 @@
  * - Content: POST /v2/post/publish/content/init/ with PULL_FROM_URL, PHOTO.
  */
 
-const TIKTOK_AUTH_URL = 'https://www.tiktok.com/v2/oauth/authorize/';
+const TIKTOK_AUTH_URL = 'https://www.tiktok.com/v2/auth/authorize/';
 const TIKTOK_TOKEN_URL = 'https://open.tiktokapis.com/v2/oauth/token/';
 const TIKTOK_REFRESH_URL = 'https://open.tiktokapis.com/v2/oauth/token/';
 const TIKTOK_CONTENT_INIT_URL = 'https://open.tiktokapis.com/v2/post/publish/content/init/';
