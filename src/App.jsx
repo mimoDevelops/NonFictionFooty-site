@@ -5,6 +5,8 @@ import Layout from './Layout';
 import Dashboard from './pages/Dashboard';
 import NewDraft from './pages/NewDraft';
 import DraftDetail from './pages/DraftDetail';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 import { api, routes } from './api';
 
 function AuthHandler() {
@@ -33,6 +35,8 @@ function AppInner() {
           <Route index element={<Dashboard />} />
           <Route path="drafts/new" element={<NewDraft />} />
           <Route path="drafts/:id" element={<DraftDetail />} />
+          <Route path="privacy" element={<Privacy />} />
+          <Route path="terms" element={<Terms />} />
         </Route>
       </Routes>
     </>
