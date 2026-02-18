@@ -1,0 +1,17 @@
+name = "nonfictionfooty-site"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "dist"
+
+# D1 database (create via: wrangler d1 create nonfictionfooty-db)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "nonfictionfooty-db"
+# database_id = "<YOUR_D1_DATABASE_ID>"
+
+# R2 bucket (create via: wrangler r2 bucket create nonfictionfooty-media)
+# [[r2_buckets]]
+# binding = "BUCKET"
+# bucket_name = "nonfictionfooty-media"
+
+# Env vars are set in Cloudflare Dashboard > Pages > Settings > Environment variables
+# TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI, UNSPLASH_ACCESS_KEY (optional)
