@@ -1,4 +1,4 @@
-import { getDraftById, updateDraft } from '../../_lib/db.js';
+import { getDraftById, updateDraft } from '../../../_lib/db.js';
 
 export async function onRequestPost(context) {
   const { env, params } = context;

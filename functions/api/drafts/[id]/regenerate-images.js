@@ -1,5 +1,5 @@
-import { getDraftById, updateDraft } from '../../_lib/db.js';
-import { getImageCandidates } from '../../_lib/images.js';
+import { getDraftById, updateDraft } from '../../../_lib/db.js';
+import { getImageCandidates } from '../../../_lib/images.js';
 
 export async function onRequestPost(context) {
   const { env, params } = context;
