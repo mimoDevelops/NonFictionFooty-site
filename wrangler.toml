@@ -2,11 +2,15 @@ name = "nonfictionfooty-site"
 compatibility_date = "2024-01-01"
 pages_build_output_dir = "dist"
 
+# In Cloudflare Dashboard: Pages → Your project → Settings → Builds & deployments
+# set Build command to:  npm run build
+# (so that dist/ is created before deployment)
+
 # D1 database (create via: wrangler d1 create nonfictionfooty-db)
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "nonfictionfooty-db"
-# database_id = "<YOUR_D1_DATABASE_ID>"
+[[d1_databases]]
+binding = "DB"
+database_name = "nonfictionfooty-db"
+database_id = "PASTE_YOUR_DATABASE_ID_HERE"
 
 # R2 bucket (create via: wrangler r2 bucket create nonfictionfooty-media)
 # [[r2_buckets]]
