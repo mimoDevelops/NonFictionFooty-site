@@ -10,7 +10,7 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "nonfictionfooty-db"
-database_id = "PASTE_YOUR_DATABASE_ID_HERE"
+database_id = "db5edcfa-668b-43df-ae15-e4d2154533cf"
 
 # R2 bucket (create via: wrangler r2 bucket create nonfictionfooty-media)
 # [[r2_buckets]]
