@@ -1,5 +1,5 @@
-import { exchangeCodeForTokens } from '../../_lib/tiktok.js';
-import { upsertTikTokAuth } from '../../_lib/db.js';
+import { exchangeCodeForTokens } from '../../lib/tiktok.js';
+import { upsertTikTokAuth } from '../../lib/db.js';
 
 const FRONTEND_ORIGIN = 'https://nonfictionfooty-site.pages.dev';
 

@@ -1,4 +1,4 @@
-import { getAuthorizeUrl } from '../../_lib/tiktok.js';
+import { getAuthorizeUrl } from '../../lib/tiktok.js';
 
 export async function onRequestGet(context) {
   const { env } = context;

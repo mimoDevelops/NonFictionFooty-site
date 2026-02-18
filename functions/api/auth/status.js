@@ -1,5 +1,5 @@
-import { getTikTokAuth } from '../../_lib/db.js';
-import { getValidAccessToken } from '../../_lib/tiktok.js';
+import { getTikTokAuth } from '../../lib/db.js';
+import { getValidAccessToken } from '../../lib/tiktok.js';
 
 export async function onRequestGet(context) {
   const { env } = context;

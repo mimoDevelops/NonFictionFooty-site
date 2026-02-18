@@ -1,7 +1,7 @@
-import { listDrafts, insertDraft } from '../../_lib/db.js';
-import { generateStoryDraft } from '../../_lib/story.js';
-import { getImageCandidates } from '../../_lib/images.js';
-import { chooseSlideCount } from '../../_lib/tiktok.js';
+import { listDrafts, insertDraft } from '../../lib/db.js';
+import { generateStoryDraft } from '../../lib/story.js';
+import { getImageCandidates } from '../../lib/images.js';
+import { chooseSlideCount } from '../../lib/tiktok.js';
 
 export async function onRequestGet(context) {
   const { env, request } = context;

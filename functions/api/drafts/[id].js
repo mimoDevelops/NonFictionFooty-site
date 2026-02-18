@@ -1,4 +1,4 @@
-import { getDraftById } from '../../_lib/db.js';
+import { getDraftById } from '../../lib/db.js';
 
 export async function onRequestGet(context) {
   const { env, params } = context;
