@@ -1,26 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { api, routes } from './api';
 
 export default function Layout() {
-  const [tiktokConnected, setTiktokConnected] = useState(false);
-  useEffect(() => {
-    api.get(routes.authStatus()).then((d) => setTiktokConnected(d.connected)).catch(() => setTiktokConnected(false));
-  }, []);
-
   return (
     <div className="layout">
       <header className="header">
         <Link to="/" className="logo">NonFictionFooty</Link>
         <nav>
           <Link to="/">Home</Link>
-          <Link to="/drafts">Drafts</Link>
-          <Link to="/drafts/new">New draft</Link>
-          {tiktokConnected ? (
-            <span className="tiktok-badge connected">Connected to TikTok</span>
-          ) : (
-            <a href={routes.tiktokLogin()} className="tiktok-badge connect">Connect TikTok</a>
-          )}
+          <Link to="/create">Create</Link>
+          <Link to="/library">Library</Link>
         </nav>
       </header>
       <main className="main">
@@ -31,9 +20,9 @@ export default function Layout() {
         <span className="sep">·</span>
         <Link to="/privacy">Privacy Policy</Link>
         <span className="sep">·</span>
-        <Link to="/about">About / Contact</Link>
+        <Link to="/about">About</Link>
         <span className="sep">·</span>
-        <Link to="/app-review">TikTok integration</Link>
+        <Link to="/app-review">App Review</Link>
       </footer>
     </div>
   );

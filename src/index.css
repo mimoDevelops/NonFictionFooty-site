@@ -173,3 +173,11 @@ input, textarea, select {
 .legal-page p { margin: 0 0 0.75rem; }
 .app-review-page code { font-family: var(--fontMono); font-size: 0.85em; background: var(--surface2); padding: 0.1rem 0.35rem; border-radius: 4px; }
 .about-page h2 { font-size: 1.15rem; margin: 1.25rem 0 0.5rem; }
+.job-list { list-style: none; padding: 0; }
+.job-list li { margin-bottom: 0.5rem; }
+.job-list .status-completed { color: var(--accent); }
+.job-list .status-failed { color: var(--danger); }
+.export-page .status-line { margin-bottom: 1rem; }
+.export-section, .export-actions, .checklist { margin-bottom: 1.5rem; }
+.export-actions .button-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.video-preview { max-height: 70vh; }

@@ -1,7 +1,4 @@
-const getBase = () => {
-  if (import.meta.env.DEV) return '';
-  return ''; // same origin on Pages
-};
+const getBase = () => (import.meta.env.DEV ? '' : '');
 
 export const api = {
   async get(path) {
@@ -23,12 +20,9 @@ export const api = {
 
 export const routes = {
   health: () => '/api/health',
-  drafts: () => '/api/drafts',
-  draft: (id) => `/api/drafts/${id}`,
-  approve: (id) => `/api/drafts/${id}/approve`,
-  regenerateImages: (id) => `/api/drafts/${id}/regenerate-images`,
-  upload: (id) => `/api/drafts/${id}/upload`,
-  authStatus: () => '/api/auth/status',
-  tiktokLogin: () => '/auth/tiktok/login',
-  media: (key) => `/media/${key}`,
+  generate: () => '/api/generate',
+  jobs: () => '/api/jobs',
+  job: (id) => `/api/jobs/${id}`,
+  jobDownload: (id) => `/api/jobs/${id}/download`,
+  jobAsset: (id, type) => `/api/jobs/${id}/asset/${type}`,
 };

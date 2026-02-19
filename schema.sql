@@ -1,31 +1,26 @@
--- D1 schema for NonFictionFooty
+-- D1 schema for NonFictionFooty (TikTok-API-free: jobs only)
 -- Run: wrangler d1 execute nonfictionfooty-db --remote --file=schema.sql
 
-CREATE TABLE IF NOT EXISTS drafts (
+-- Jobs: generate → export workflow
+CREATE TABLE IF NOT EXISTS jobs (
   id TEXT PRIMARY KEY,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
-  status TEXT NOT NULL DEFAULT 'DRAFT',
-  headline TEXT,
-  story_json TEXT,
-  sources_json TEXT,
-  min_slides INTEGER NOT NULL DEFAULT 3,
-  max_slides INTEGER NOT NULL DEFAULT 10,
-  chosen_slide_count INTEGER,
+  status TEXT NOT NULL DEFAULT 'pending',
+  topic TEXT,
+  team_or_player TEXT,
+  era_or_match TEXT,
+  tone TEXT,
+  duration_sec INTEGER,
+  style_preset TEXT,
+  script_json TEXT,
   caption TEXT,
   hashtags TEXT,
-  image_candidates_json TEXT,
-  chosen_images_json TEXT,
-  tiktok_publish_id TEXT,
+  output_final_mp4 TEXT,
+  output_captions_json TEXT,
+  output_subtitles_srt TEXT,
+  output_cover_png TEXT,
   error TEXT
 );
 
-CREATE INDEX IF NOT EXISTS idx_drafts_status ON drafts(status);
-CREATE INDEX IF NOT EXISTS idx_drafts_created_at ON drafts(created_at DESC);
-
-CREATE TABLE IF NOT EXISTS tiktok_auth (
-  open_id TEXT PRIMARY KEY,
-  access_token TEXT NOT NULL,
-  refresh_token TEXT NOT NULL,
-  expires_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON jobs(created_at DESC);

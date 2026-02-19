@@ -17,5 +17,4 @@ database_id = "db5edcfa-668b-43df-ae15-e4d2154533cf"
 binding = "BUCKET"
 bucket_name = "nonfictionfooty-media"
 
-# Env vars are set in Cloudflare Dashboard > Pages > Settings > Environment variables
-# TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REDIRECT_URI, UNSPLASH_ACCESS_KEY (optional)
+# Env vars: set in Cloudflare Dashboard > Pages > Settings > Environment variables (e.g. UNSPLASH_ACCESS_KEY optional)

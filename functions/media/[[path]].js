@@ -1,6 +1,6 @@
 /**
  * Serve R2 object at /media/<path> (e.g. /media/draftId/0.jpg).
- * Required for TikTok verified URL prefix: https://nonfictionfooty-site.pages.dev/media/*
+ * Serve R2 objects at /media/* (e.g. for job assets or legacy paths).
  */
 
 const DEFAULT_CONTENT_TYPE = 'image/jpeg';
