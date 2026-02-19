@@ -18,7 +18,7 @@ export default function Create() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { jobId } = await api.post(routes.generate(), {
+      const res = await api.post(routes.generate(), {
         topic: topic || 'soccer',
         teamOrPlayer: teamOrPlayer || undefined,
         eraOrMatch: eraOrMatch || undefined,
@@ -26,6 +26,11 @@ export default function Create() {
         durationSec: Math.min(120, Math.max(30, durationSec)),
         stylePreset: stylePreset || 'default',
       });
+      const jobId = res?.jobId;
+      if (!jobId || String(jobId) === 'null') {
+        toast.error('Server did not return a job ID');
+        return;
+      }
       toast.success('Job started');
       navigate(`/export/${jobId}`);
     } catch (err) {

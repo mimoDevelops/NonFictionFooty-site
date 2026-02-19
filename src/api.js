@@ -3,7 +3,11 @@ const getBase = () => (import.meta.env.DEV ? '' : '');
 export const api = {
   async get(path) {
     const r = await fetch(getBase() + path, { credentials: 'include' });
-    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.statusText);
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      const msg = (body && body.error != null && String(body.error) !== 'null') ? String(body.error) : r.statusText || 'Request failed';
+      throw new Error(msg);
+    }
     return r.json();
   },
   async post(path, body) {
@@ -13,7 +17,11 @@ export const api = {
       body: body ? JSON.stringify(body) : undefined,
       credentials: 'include',
     });
-    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.statusText);
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      const msg = (body && body.error != null && String(body.error) !== 'null') ? String(body.error) : r.statusText || 'Request failed';
+      throw new Error(msg);
+    }
     return r.json();
   },
 };

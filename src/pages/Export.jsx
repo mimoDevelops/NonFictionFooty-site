@@ -10,7 +10,14 @@ export default function Export() {
   const [polling, setPolling] = useState(false);
   const toast = useToast();
 
+  const validJobId = jobId && String(jobId) !== 'null' && String(jobId) !== 'undefined';
+
   useEffect(() => {
+    if (!validJobId) {
+      setData({ error: 'Invalid job' });
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     async function fetch_() {
       try {
@@ -29,14 +36,15 @@ export default function Export() {
           return () => clearInterval(t);
         }
       } catch (e) {
-        if (!cancelled) setData({ error: e.message });
+        const msg = e?.message || e?.toString?.() || 'Request failed';
+        if (!cancelled) setData({ error: msg });
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
     fetch_();
     return () => { cancelled = true; };
-  }, [jobId]);
+  }, [jobId, validJobId]);
 
   const copyCaption = () => {
     if (data?.caption) {
@@ -52,18 +60,23 @@ export default function Export() {
   };
 
   if (loading || !data) return <div className="page"><p className="muted">Loading…</p></div>;
-  if (data.error) return <div className="page"><p className="error">{data.error}</p></div>;
+  // Only show full-page error when the request failed (no job) or job status is failed.
+  // Completed/pending jobs may have job.error set in DB; don't treat that as a page error.
+  const isRequestError = data.error && data.status !== 'completed' && data.status !== 'pending';
+  const errMsg = (data.error == null || String(data.error) === 'null' || String(data.error) === 'undefined')
+    ? 'Something went wrong' : String(data.error);
+  if (isRequestError) return <div className="page"><p className="error">{errMsg}</p></div>;
 
   const urls = data.downloadUrls || {};
   const base = routes.job(jobId);
 
   return (
     <div className="page export-page">
-      <h1>Export — {data.jobId?.slice(0, 8)}</h1>
-      <p className="status-line">Status: <strong>{data.status}</strong></p>
+      <h1>Export — {data.jobId && String(data.jobId) !== 'null' ? String(data.jobId).slice(0, 8) : '…'}</h1>
+      <p className="status-line">Status: <strong>{data.status ?? '—'}</strong></p>
 
       {data.status === 'pending' && <p className="muted">Processing… {polling && '(polling)'}</p>}
-      {data.status === 'failed' && <p className="error">{data.error}</p>}
+      {data.status === 'failed' && <p className="error">{data.error ?? 'Job failed'}</p>}
 
       {data.status === 'completed' && (
         <>

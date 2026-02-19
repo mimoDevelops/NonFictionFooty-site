@@ -24,8 +24,8 @@ export async function onRequestGet(context) {
 function formatJobResponse(env, job) {
   const base = `${BASE_URL}/api/jobs/${job.id}`;
   const out = {
-    jobId: job.id,
-    status: job.status,
+    jobId: job.id ?? null,
+    status: job.status ?? 'unknown',
     created_at: job.created_at,
     topic: job.topic,
     team_or_player: job.team_or_player,
@@ -35,7 +35,7 @@ function formatJobResponse(env, job) {
     style_preset: job.style_preset,
     caption: job.caption,
     hashtags: job.hashtags,
-    error: job.error,
+    error: job.status === 'failed' ? (job.error ?? 'Job failed') : undefined,
   };
   if (job.status === 'completed') {
     out.downloadUrls = {
