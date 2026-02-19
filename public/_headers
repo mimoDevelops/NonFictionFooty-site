@@ -1,5 +1,5 @@
 # Headers for static assets (HTML, JS, CSS). Applied by Cloudflare Pages.
-# CSP: allow unsafe-eval so scripts that use eval() (e.g. some libs or dev tooling) can run.
-# If you locked down CSP in the Cloudflare Dashboard, update script-src there to include 'unsafe-eval', or remove the dashboard CSP so this file applies.
+# Remove any existing CSP so our policy (with unsafe-eval) applies and the eval error goes away.
 /*
+  ! Content-Security-Policy
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'
