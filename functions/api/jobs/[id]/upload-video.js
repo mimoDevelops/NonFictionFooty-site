@@ -4,7 +4,7 @@
  * Body: raw MP4 bytes. Header: Authorization: Bearer <WEBHOOK_SECRET>
  * Writes to R2 at jobs/{id}/final.mp4 and marks job completed.
  */
-import { getJobById, updateJob } from '../../../../lib/db.js';
+import { getJobById, updateJob } from '../../../lib/db.js';
 
 const JOBS_PREFIX = 'jobs';
 
