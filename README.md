@@ -19,6 +19,26 @@ Cloudflare Pages app that generates short football story videos and export packa
 
 ---
 
+## How video is created (current vs real)
+
+**Right now** the app does **not** generate real story videos. For each job it:
+
+- Generates **script, caption, and hashtags** (real content).
+- Writes a **placeholder MP4** (~1 KB, single black frame) and a placeholder cover/SRT to R2 so the Export page and “Download MP4” work.
+
+So you get a **working pipeline** (create → process → export → download), but the **MP4 is only a placeholder**, not a narrated story clip.
+
+**To get real story videos** you need to add:
+
+1. **Voice** — Text-to-speech (e.g. ElevenLabs, Play.ht, or another TTS API) to turn the script into audio.
+2. **Video assembly** — Something that combines images/clips + audio into an MP4 (e.g. **FFmpeg**). Cloudflare Workers **cannot** run FFmpeg, so this has to run elsewhere:
+   - A **separate service** (e.g. a small Node/Python server or serverless function that runs FFmpeg and uploads the result to R2), or
+   - A **third‑party video API** (e.g. Creatomate, Shotstack, or similar) that returns a video URL you then store in R2.
+
+See **VIDEO.md** in this repo for a concrete “path to real video” and options.
+
+---
+
 ## Architecture
 
 | Layer | Technology |

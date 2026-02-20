@@ -82,9 +82,14 @@ export default function Export() {
         <>
           <section className="export-section">
             <h2>Video preview</h2>
+            <p className="muted" style={{ marginBottom: '0.5rem' }}>
+              Placeholder clip (one frame). Real story video: see README.
+            </p>
             <video
-              src={urls.mp4 ? base + '/download' : ''}
+              key={jobId}
+              src={urls.mp4 ? (typeof urls.mp4 === 'string' && urls.mp4.startsWith('http') ? urls.mp4 : base + '/download') : ''}
               controls
+              playsInline
               className="video-preview"
               style={{ maxWidth: '100%', aspectRatio: '9/16' }}
             />
