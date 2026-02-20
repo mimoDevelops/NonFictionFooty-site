@@ -28,14 +28,12 @@ Cloudflare Pages app that generates short football story videos and export packa
 
 So you get a **working pipeline** (create → process → export → download), but the **MP4 is only a placeholder**, not a narrated story clip.
 
-**To get real story videos** you need to add:
+**To get real story videos** (optional):
 
-1. **Voice** — Text-to-speech (e.g. ElevenLabs, Play.ht, or another TTS API) to turn the script into audio.
-2. **Video assembly** — Something that combines images/clips + audio into an MP4 (e.g. **FFmpeg**). Cloudflare Workers **cannot** run FFmpeg, so this has to run elsewhere:
-   - A **separate service** (e.g. a small Node/Python server or serverless function that runs FFmpeg and uploads the result to R2), or
-   - A **third‑party video API** (e.g. Creatomate, Shotstack, or similar) that returns a video URL you then store in R2.
+1. Set **Cloudflare env vars**: `ELEVENLABS_API_KEY`, `WEBHOOK_SECRET`, `EXTERNAL_VIDEO_WORKER_URL` (see VIDEO.md).
+2. Deploy the **video worker** in `video-worker/` to Railway or Render (Node + FFmpeg). It receives audio from your app, builds an MP4, and uploads it via `POST /api/jobs/:id/upload-video`.
 
-See **VIDEO.md** in this repo for a concrete “path to real video” and options.
+Then new jobs will use TTS + the external worker and produce a real MP4 (audio + static image). See **VIDEO.md** and **video-worker/README.md** for step-by-step setup.
 
 ---
 

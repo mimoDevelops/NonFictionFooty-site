@@ -1,0 +1,16 @@
+{
+  "name": "nonfictionfooty-video-worker",
+  "version": "1.0.0",
+  "description": "External FFmpeg worker: audio + image → MP4, then upload to NonFictionFooty",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

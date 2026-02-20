@@ -1,12 +1,15 @@
 /**
- * MVP job processor: generates script/caption/hashtags and writes placeholder outputs to R2.
- * Replace with real LLM/TTS/FFmpeg pipeline later.
+ * Job processor: script + optional TTS (ElevenLabs) + placeholder or external video worker.
+ * When ELEVENLABS_API_KEY is set, generates audio and stores at jobs/{id}/audio.mp3.
+ * When EXTERNAL_VIDEO_WORKER_URL + WEBHOOK_SECRET are set, invokes external worker to build real MP4 and upload via /upload-video.
  */
 
 import { generateStoryDraft } from './story.js';
 import { updateJob } from './db.js';
 
 const JOBS_PREFIX = 'jobs';
+const DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel
+const BASE_URL = 'https://nonfictionfooty-site.pages.dev';
 
 export async function runJob(env, jobId, job) {
   const bucket = env.BUCKET;
@@ -24,10 +27,56 @@ export async function runJob(env, jobId, job) {
     await bucket.put(`${prefix}/captions.json`, new TextEncoder().encode(captionsJson), { httpMetadata: { contentType: 'application/json' } });
     const srt = '1\n00:00:00,000 --> 00:00:05,000\n' + (caption || '') + '\n';
     await bucket.put(`${prefix}/subtitles.srt`, new TextEncoder().encode(srt), { httpMetadata: { contentType: 'application/x-subrip' } });
-    const minimalMp4 = getMinimalMp4Bytes();
-    await bucket.put(`${prefix}/final.mp4`, minimalMp4, { httpMetadata: { contentType: 'video/mp4' } });
     const coverPng = getMinimalPngBytes();
     await bucket.put(`${prefix}/cover.png`, coverPng, { httpMetadata: { contentType: 'image/png' } });
+
+    let audioStored = false;
+    const scriptText = (script.slides || []).map((s) => s.text).join(' ') || caption;
+    if (env.ELEVENLABS_API_KEY && scriptText) {
+      try {
+        const audioBytes = await fetchElevenLabsTTS(env.ELEVENLABS_API_KEY, scriptText, env.ELEVENLABS_VOICE_ID || DEFAULT_VOICE_ID);
+        if (audioBytes && audioBytes.byteLength > 0) {
+          await bucket.put(`${prefix}/audio.mp3`, audioBytes, { httpMetadata: { contentType: 'audio/mpeg' } });
+          audioStored = true;
+        }
+      } catch (e) {
+        console.error('TTS failed:', e.message);
+      }
+    }
+
+    const useExternalVideo = env.EXTERNAL_VIDEO_WORKER_URL && env.WEBHOOK_SECRET;
+    if (useExternalVideo && audioStored) {
+      await updateJob(env, jobId, {
+        script_json: JSON.stringify(script),
+        caption,
+        hashtags,
+        output_captions_json: `${prefix}/captions.json`,
+        output_subtitles_srt: `${prefix}/subtitles.srt`,
+        output_cover_png: `${prefix}/cover.png`,
+        error: null,
+      });
+      const audioUrl = `${BASE_URL}/api/jobs/${jobId}/asset/audio`;
+      const uploadUrl = `${BASE_URL}/api/jobs/${jobId}/upload-video`;
+      try {
+        await fetch(env.EXTERNAL_VIDEO_WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jobId,
+            audioUrl,
+            uploadUrl,
+            webhookSecret: env.WEBHOOK_SECRET,
+          }),
+        });
+      } catch (e) {
+        await updateJob(env, jobId, { status: 'failed', error: `External worker: ${e.message}` });
+        throw e;
+      }
+      return;
+    }
+
+    const minimalMp4 = getMinimalMp4Bytes();
+    await bucket.put(`${prefix}/final.mp4`, minimalMp4, { httpMetadata: { contentType: 'video/mp4' } });
     await updateJob(env, jobId, {
       status: 'completed',
       script_json: JSON.stringify(script),
@@ -43,6 +92,23 @@ export async function runJob(env, jobId, job) {
     await updateJob(env, jobId, { status: 'failed', error: err.message });
     throw err;
   }
+}
+
+async function fetchElevenLabsTTS(apiKey, text, voiceId) {
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': apiKey,
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
+    },
+    body: JSON.stringify({
+      text: text.slice(0, 5000),
+      model_id: 'eleven_multilingual_v2',
+    }),
+  });
+  if (!res.ok) throw new Error(`ElevenLabs: ${res.status}`);
+  return res.arrayBuffer();
 }
 
 // Minimal valid MP4 (~1KB, single black frame, plays in browser). From https://gist.github.com/dmlap/5643609
