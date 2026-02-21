@@ -83,6 +83,9 @@ export default function Export() {
               {s.status === 'running' && '… '}
               {s.status === 'failed' && '✗ '}
               {s.name.replace(/_/g, ' ')} {s.status && `(${s.status})`}
+              {s.status === 'failed' && s.error && (
+                <span className="error" style={{ display: 'block', marginLeft: '1.2rem', fontSize: '0.85rem' }}>{s.error}</span>
+              )}
             </li>
           ))}
         </ul>

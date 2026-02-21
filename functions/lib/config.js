@@ -1,7 +1,8 @@
 /**
  * Env-driven config. Cloudflare Pages injects env from dashboard and wrangler bindings.
+ * Set PUBLIC_BASE_URL in Cloudflare so callbacks and download URLs use your real deployment URL.
  */
-const DEFAULT_BASE_URL = 'https://nonfictionfooty-site.pages.dev';
+const DEFAULT_BASE_URL = 'https://your-project.pages.dev';
 
 /**
  * Public origin for absolute URLs (download links, webhook callbacks).

@@ -208,7 +208,18 @@ async function fetchElevenLabsTTS(apiKey, text, voiceId) {
       model_id: 'eleven_multilingual_v2',
     }),
   });
-  if (!res.ok) throw new Error(`ElevenLabs: ${res.status}`);
+  if (!res.ok) {
+    let msg = `ElevenLabs: ${res.status}`;
+    try {
+      const body = await res.text();
+      if (body) {
+        const o = JSON.parse(body);
+        if (o.detail?.message) msg += ` — ${o.detail.message}`;
+        else if (o.detail) msg += ` — ${typeof o.detail === 'string' ? o.detail : JSON.stringify(o.detail).slice(0, 100)}`;
+      }
+    } catch (_) {}
+    throw new Error(msg);
+  }
   return res.arrayBuffer();
 }
 
