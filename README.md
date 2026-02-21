@@ -1,32 +1,40 @@
-# Short-video generator
+# Prompt UI
 
-This project is a **web app** that creates short, scripted videos for social media.
+A minimal chat UI backed by OpenAI. The frontend is a single page (Vite + React); the backend is a Cloudflare Pages Function that proxies requests to OpenAI. **The OpenAI API key is only set in Cloudflare and never exposed to the client.**
 
-You enter a topic (and optional category, tone, duration). The app generates a **script**, **caption**, **hashtags**, optional **voiceover**, and a **video file**. You **download** the results and upload them yourself to TikTok, Instagram, or wherever—there’s no built-in posting to any platform.
-
-**Tech:** Cloudflare Pages (frontend + API), D1 (database), R2 (storage). Optional API keys and an optional external “video worker” service can be configured for LLM script generation, voiceover, and real MP4 rendering.
+- **Hosting:** Cloudflare Pages (frontend + `functions/` for serverless API).
+- **Stack:** Vite, React, Cloudflare Pages Functions, OpenAI Chat Completions.
 
 ---
 
-## When you come back to this project
+## Setup
 
-**Issues we ran into (for next time):**
+1. **Environment variable (required for `/api/chat`):**
+   - In [Cloudflare Dashboard](https://dash.cloudflare.com) → **Pages** → your project → **Settings** → **Environment variables**, add:
+   - `OPENAI_API_KEY` = your OpenAI API key (Encrypted).
+   - Do **not** put the key in client code or in the repo.
 
-1. **Cloudflare build failed:** “The symbol 'context' has already been declared” in `functions/api/generate.js`. The request handler parameter is `context` and the JSON body also had a field `context`, so the name collided. **Fix:** Destructure the body field as `context: contextPayload` and use `contextPayload` when building `context_json`.
-2. **TTS step failing on Export:** ElevenLabs can fail (invalid key, quota, wrong voice ID). **Fix:** Export page now shows the step error under “tts (failed)”. In `jobProcessor.js`, ElevenLabs errors include the API response detail. Check Cloudflare env: `ELEVENLABS_API_KEY` and optional `ELEVENLABS_VOICE_ID`.
-3. **Video worker / Render:** To get real MP4s, deploy `video-worker/` (e.g. Render). Set **Root Directory** to `video-worker` and **Runtime** to **Docker** so FFmpeg is available. Put the service URL in Cloudflare as `EXTERNAL_VIDEO_WORKER_URL` and set `WEBHOOK_SECRET` (same value is sent to the worker in the POST body).
-4. **Base URL:** Set `PUBLIC_BASE_URL` in Cloudflare to your real deployment URL so worker callbacks and download links work. Default in code is a placeholder.
+2. **Local dev:**
+   ```bash
+   npm install
+   npm run dev
+   ```
+   This runs the Vite dev server (frontend only). To test the full stack including the `/api/chat` function locally, use:
+   ```bash
+   npm run build
+   npx wrangler pages dev dist --compatibility-date=2024-01-01
+   ```
+   Then open the URL Wrangler prints (e.g. `http://localhost:8788`). The Pages Function will run locally and will need `OPENAI_API_KEY` in a `.dev.vars` file in the project root (create it; format: `OPENAI_API_KEY=sk-...`). **Do not commit `.dev.vars`.**
 
-**To save and push (shelf this state):**
+3. **Deploy:**
+   - Connect the repo to Cloudflare Pages and set the build command to `npm run build` and output directory to `dist`.
+   - Ensure `OPENAI_API_KEY` is set in the project’s environment variables for production (and preview if you use it).
 
-```bash
-cd path/to/nonfictionfooty-site
-git add -A
-git status
-git commit -m "Shelf: short-video generator, step pipeline, LLM/TTS/worker, docs trimmed, shelf notes in README"
-git push origin main
-```
+---
 
-Use your actual branch if it’s not `main`.
+## Security / ops
+
+- **API key:** Only in Cloudflare Pages env (and locally in `.dev.vars`). Never log it or expose it to the client.
+- **Rate limiting:** Optional; the API rejects bodies larger than 100KB. You can add per-IP or per-request cooldowns in `functions/api/chat.js` if needed.
 
 MIT.
