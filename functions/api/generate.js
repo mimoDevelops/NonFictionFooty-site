@@ -41,14 +41,14 @@ export async function onRequestPost(context) {
     durationSec,
     stylePreset,
     category,
-    context,
+    context: contextPayload,
   } = body;
 
   const topicStr = topic != null ? String(topic).trim().slice(0, MAX_TOPIC_LEN) : null;
   if (!topicStr) return Response.json({ error: 'topic is required' }, { status: 400 });
 
   const duration = durationSec != null ? Math.min(120, Math.max(30, Number(durationSec) || 45)) : 45;
-  const contextJson = context != null ? (typeof context === 'string' ? context : JSON.stringify(context)) : null;
+  const contextJson = contextPayload != null ? (typeof contextPayload === 'string' ? contextPayload : JSON.stringify(contextPayload)) : null;
 
   const jobId = crypto.randomUUID();
   const job = {
