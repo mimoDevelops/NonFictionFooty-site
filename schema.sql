@@ -1,7 +1,8 @@
--- D1 schema for NonFictionFooty (TikTok-API-free: jobs only)
+-- D1 schema for NonFictionFooty (topic-agnostic short-video generator)
 -- Run: wrangler d1 execute nonfictionfooty-db --remote --file=schema.sql
+-- For existing DBs, run migrations/001_step_state_and_category.sql first.
 
--- Jobs: generate → export workflow
+-- Jobs: generate → export workflow (step-based, resumable)
 CREATE TABLE IF NOT EXISTS jobs (
   id TEXT PRIMARY KEY,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -19,7 +20,10 @@ CREATE TABLE IF NOT EXISTS jobs (
   output_captions_json TEXT,
   output_subtitles_srt TEXT,
   output_cover_png TEXT,
-  error TEXT
+  error TEXT,
+  category TEXT,
+  steps_json TEXT,
+  context_json TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);

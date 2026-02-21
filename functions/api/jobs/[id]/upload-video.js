@@ -29,11 +29,24 @@ export async function onRequestPost(context) {
 
   const prefix = `${JOBS_PREFIX}/${id}`;
   await bucket.put(`${prefix}/final.mp4`, body, { httpMetadata: { contentType: 'video/mp4' } });
+
+  const now = new Date().toISOString();
+  let steps = [];
+  try {
+    if (job.steps_json) steps = typeof job.steps_json === 'string' ? JSON.parse(job.steps_json) : job.steps_json;
+  } catch {
+    steps = [];
+  }
+  const renderIdx = steps.findIndex((s) => s.name === 'render');
+  if (renderIdx >= 0) {
+    steps[renderIdx] = { ...steps[renderIdx], status: 'completed', finished_at: now, error: null };
+  }
+
   await updateJob(env, id, {
     status: 'completed',
     output_final_mp4: `${prefix}/final.mp4`,
     error: null,
+    steps_json: steps.length ? JSON.stringify(steps) : undefined,
   });
-
   return Response.json({ ok: true, jobId: id });
 }

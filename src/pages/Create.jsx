@@ -5,6 +5,7 @@ import { useToast } from '../ToastContext';
 
 export default function Create() {
   const [topic, setTopic] = useState('');
+  const [category, setCategory] = useState('custom');
   const [teamOrPlayer, setTeamOrPlayer] = useState('');
   const [eraOrMatch, setEraOrMatch] = useState('');
   const [tone, setTone] = useState('factual');
@@ -19,12 +20,13 @@ export default function Create() {
     setLoading(true);
     try {
       const res = await api.post(routes.generate(), {
-        topic: topic || 'soccer',
-        teamOrPlayer: teamOrPlayer || undefined,
-        eraOrMatch: eraOrMatch || undefined,
+        topic: (topic || '').trim() || 'short video',
+        teamOrPlayer: (teamOrPlayer || '').trim() || undefined,
+        eraOrMatch: (eraOrMatch || '').trim() || undefined,
         tone,
         durationSec: Math.min(120, Math.max(30, durationSec)),
         stylePreset: stylePreset || 'default',
+        category: category || undefined,
       });
       const jobId = res?.jobId;
       if (!jobId || String(jobId) === 'null') {
@@ -45,11 +47,20 @@ export default function Create() {
       <h1>Create video</h1>
       <form onSubmit={submit} className="form">
         <label>Topic *</label>
-        <input type="text" value={topic} onChange={e => setTopic(e.target.value)} placeholder="e.g. World Cup 1986" required />
-        <label>Team or player</label>
-        <input type="text" value={teamOrPlayer} onChange={e => setTeamOrPlayer(e.target.value)} placeholder="e.g. Maradona" />
-        <label>Era or match</label>
-        <input type="text" value={eraOrMatch} onChange={e => setEraOrMatch(e.target.value)} placeholder="e.g. 1980s" />
+        <input type="text" value={topic} onChange={e => setTopic(e.target.value)} placeholder="e.g. Why compound interest matters, World Cup 1986" required />
+        <label>Category</label>
+        <select value={category} onChange={e => setCategory(e.target.value)}>
+          <option value="custom">Custom</option>
+          <option value="soccer">Soccer</option>
+          <option value="motivation">Motivation</option>
+          <option value="history">History</option>
+          <option value="finance">Finance</option>
+          <option value="tech">Tech</option>
+        </select>
+        <label>Context 1 (optional)</label>
+        <input type="text" value={teamOrPlayer} onChange={e => setTeamOrPlayer(e.target.value)} placeholder="e.g. person, event, concept" />
+        <label>Context 2 (optional)</label>
+        <input type="text" value={eraOrMatch} onChange={e => setEraOrMatch(e.target.value)} placeholder="e.g. era, match, timeframe" />
         <label>Tone</label>
         <select value={tone} onChange={e => setTone(e.target.value)}>
           <option value="factual">Factual</option>

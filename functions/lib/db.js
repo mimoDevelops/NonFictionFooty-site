@@ -25,6 +25,9 @@ function rowToJob(row) {
     output_subtitles_srt: row.output_subtitles_srt,
     output_cover_png: row.output_cover_png,
     error: row.error,
+    category: row.category ?? null,
+    steps_json: row.steps_json ?? null,
+    context_json: row.context_json ?? null,
   };
 }
 
@@ -46,8 +49,8 @@ export async function insertJob(env, job) {
   const db = getDb(env);
   if (!db) throw new Error('D1 not configured');
   await db.prepare(
-    `INSERT INTO jobs (id, created_at, status, topic, team_or_player, era_or_match, tone, duration_sec, style_preset, script_json, caption, hashtags, output_final_mp4, output_captions_json, output_subtitles_srt, output_cover_png, error)
-     VALUES (?, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO jobs (id, created_at, status, topic, team_or_player, era_or_match, tone, duration_sec, style_preset, script_json, caption, hashtags, output_final_mp4, output_captions_json, output_subtitles_srt, output_cover_png, error, category, steps_json, context_json)
+     VALUES (?, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     job.id,
     job.status ?? 'pending',
@@ -64,7 +67,10 @@ export async function insertJob(env, job) {
     job.output_captions_json ?? null,
     job.output_subtitles_srt ?? null,
     job.output_cover_png ?? null,
-    job.error ?? null
+    job.error ?? null,
+    job.category ?? null,
+    job.steps_json ?? null,
+    job.context_json ?? null
   ).run();
   return job;
 }
@@ -72,7 +78,7 @@ export async function insertJob(env, job) {
 export async function updateJob(env, id, updates) {
   const db = getDb(env);
   if (!db) throw new Error('D1 not configured');
-  const allowed = ['status', 'script_json', 'caption', 'hashtags', 'output_final_mp4', 'output_captions_json', 'output_subtitles_srt', 'output_cover_png', 'error'];
+  const allowed = ['status', 'script_json', 'caption', 'hashtags', 'output_final_mp4', 'output_captions_json', 'output_subtitles_srt', 'output_cover_png', 'error', 'category', 'steps_json', 'context_json'];
   const set = [];
   const values = [];
   for (const [k, v] of Object.entries(updates)) {

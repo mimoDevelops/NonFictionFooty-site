@@ -75,6 +75,19 @@ export default function Export() {
       <h1>Export — {data.jobId && String(data.jobId) !== 'null' ? String(data.jobId).slice(0, 8) : '…'}</h1>
       <p className="status-line">Status: <strong>{data.status ?? '—'}</strong></p>
 
+      {Array.isArray(data.steps) && data.steps.length > 0 && (
+        <ul className="step-progress" style={{ listStyle: 'none', paddingLeft: 0, fontSize: '0.9rem', color: 'var(--muted, #888)' }}>
+          {data.steps.map((s) => (
+            <li key={s.name} style={{ marginBottom: '0.25rem' }}>
+              {s.status === 'completed' && '✓ '}
+              {s.status === 'running' && '… '}
+              {s.status === 'failed' && '✗ '}
+              {s.name.replace(/_/g, ' ')} {s.status && `(${s.status})`}
+            </li>
+          ))}
+        </ul>
+      )}
+
       {data.status === 'pending' && <p className="muted">Processing… {polling && '(polling)'}</p>}
       {data.status === 'failed' && <p className="error">{data.error ?? 'Job failed'}</p>}
 
@@ -83,7 +96,7 @@ export default function Export() {
           <section className="export-section">
             <h2>Video preview</h2>
             <p className="muted" style={{ marginBottom: '0.5rem' }}>
-              Placeholder clip (one frame). Real story video: see README.
+              Preview. If you see only a short placeholder clip, enable LLM + video worker for full videos (see README).
             </p>
             <video
               key={jobId}

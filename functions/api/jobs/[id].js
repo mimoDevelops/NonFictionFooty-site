@@ -1,7 +1,6 @@
-import { getJobById, updateJob } from '../../lib/db.js';
+import { getJobById } from '../../lib/db.js';
+import { getBaseUrl } from '../../lib/config.js';
 import { runJob } from '../../lib/jobProcessor.js';
-
-const BASE_URL = 'https://nonfictionfooty-site.pages.dev';
 
 export async function onRequestGet(context) {
   const { env, params } = context;
@@ -21,8 +20,18 @@ export async function onRequestGet(context) {
   return Response.json(formatJobResponse(env, job));
 }
 
+function parseStepsJson(val) {
+  if (val == null) return null;
+  try {
+    return typeof val === 'string' ? JSON.parse(val) : val;
+  } catch {
+    return null;
+  }
+}
+
 function formatJobResponse(env, job) {
-  const base = `${BASE_URL}/api/jobs/${job.id}`;
+  const baseUrl = getBaseUrl(env);
+  const base = `${baseUrl}/api/jobs/${job.id}`;
   const out = {
     jobId: job.id ?? null,
     status: job.status ?? 'unknown',
@@ -36,6 +45,8 @@ function formatJobResponse(env, job) {
     caption: job.caption,
     hashtags: job.hashtags,
     error: job.status === 'failed' ? (job.error ?? 'Job failed') : undefined,
+    category: job.category ?? null,
+    steps: parseStepsJson(job.steps_json),
   };
   if (job.status === 'completed') {
     out.downloadUrls = {

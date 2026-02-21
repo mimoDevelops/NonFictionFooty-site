@@ -1,6 +1,6 @@
 # NonFictionFooty
 
-Cloudflare Pages app that generates short football story videos and export packages (MP4, caption, hashtags, SRT, cover) for **manual upload**. No TikTok or other platform APIs; you download and post yourself.
+Cloudflare Pages app: **general short-video generator** (any topic — soccer, finance, history, motivation, tech, etc.). Produces export packages (MP4, caption, hashtags, SRT, cover) for **manual upload**. No TikTok or Instagram APIs; you download and post yourself.
 
 **Live:** https://nonfictionfooty-site.pages.dev/
 
@@ -8,32 +8,20 @@ Cloudflare Pages app that generates short football story videos and export packa
 
 ## Manual upload workflow
 
-1. **Create** — On `/create`, enter topic, team/player, era/match, tone, duration (30–120s), style. Submit to start a job. You are redirected to `/export/:jobId`.
-2. **Processing** — The job runs (script, caption, hashtags, placeholder voiceover/subtitles, placeholder MP4 and cover). Polling or refresh shows status until `completed`.
-3. **Export** — On `/export/:jobId` you get:
-   - Video preview and **Download MP4**
-   - **Copy caption** and **Copy hashtags**
-   - **Download SRT** and **Download cover**
-   - A short posting checklist
-4. **Upload** — Use the downloaded files and caption/hashtags to post manually on your chosen platform (TikTok, Instagram, etc.).
+1. **Create** — On `/create`, enter **topic** (required), **category** (Soccer, Motivation, History, Finance, Tech, Custom), optional context fields, tone, duration (30–120s), style. Submit to start a job; you are redirected to `/export/:jobId`.
+2. **Processing** — Resumable pipeline: **generate_content** (LLM or rule-based) → **tts** (optional) → **render** (external worker or placeholder). Export page shows step progress; polling continues until `completed`.
+3. **Export** — On `/export/:jobId`: video preview, **Download MP4**, **Copy caption**, **Copy hashtags**, **Download SRT**, **Download cover**, posting checklist.
+4. **Upload** — Use the downloaded assets to post manually on your chosen platform (TikTok, Instagram, etc.).
 
 ---
 
-## How video is created (current vs real)
+## How video is created (pipeline)
 
-**Right now** the app does **not** generate real story videos. For each job it:
+- **Content:** With `LLM_API_KEY` set, an LLM generates script, beats, caption, hashtags. Otherwise a rule-based fallback is used (soccer-friendly templates).
+- **TTS (optional):** With `ELEVENLABS_API_KEY`, voiceover is generated and stored as `audio.mp3`.
+- **Render:** If `EXTERNAL_VIDEO_WORKER_URL` is set and audio exists, the external worker (Node + FFmpeg) builds the MP4 and uploads via `POST /api/jobs/:id/upload-video`. Otherwise a **placeholder MP4** (single frame) is written so Export and “Download MP4” still work.
 
-- Generates **script, caption, and hashtags** (real content).
-- Writes a **placeholder MP4** (~1 KB, single black frame) and a placeholder cover/SRT to R2 so the Export page and “Download MP4” work.
-
-So you get a **working pipeline** (create → process → export → download), but the **MP4 is only a placeholder**, not a narrated story clip.
-
-**To get real story videos** (optional):
-
-1. Set **Cloudflare env vars**: `ELEVENLABS_API_KEY`, `WEBHOOK_SECRET`, `EXTERNAL_VIDEO_WORKER_URL` (see VIDEO.md).
-2. Deploy the **video worker** in `video-worker/` to Railway or Render (Node + FFmpeg). It receives audio from your app, builds an MP4, and uploads it via `POST /api/jobs/:id/upload-video`.
-
-Then new jobs will use TTS + the external worker and produce a real MP4 (audio + static image). See **VIDEO.md** and **video-worker/README.md** for step-by-step setup.
+**To get full videos:** Set `PUBLIC_BASE_URL`, `LLM_API_KEY`, `ELEVENLABS_API_KEY`, `WEBHOOK_SECRET`, `EXTERNAL_VIDEO_WORKER_URL` (see `.env.example` and VIDEO.md). Deploy the **video-worker** in `video-worker/` (e.g. Railway or Render). See **VIDEO.md** and **video-worker/README.md**.
 
 ---
 
@@ -58,14 +46,26 @@ Then new jobs will use TTS + the external worker and produce a real MP4 (audio +
 
 ---
 
+## Environment (see .env.example)
+
+| Variable | Purpose |
+|----------|---------|
+| `PUBLIC_BASE_URL` | Base URL for webhooks/worker callbacks (default used if unset) |
+| `LLM_API_KEY` | OpenAI-compatible API key for script/beats/caption/hashtags; optional `LLM_API_BASE`, `LLM_MODEL` |
+| `ELEVENLABS_API_KEY` | TTS; if unset, no audio |
+| `WEBHOOK_SECRET` | Protects `POST /api/jobs/:id/upload-video` |
+| `EXTERNAL_VIDEO_WORKER_URL` | External renderer; if unset, placeholder MP4 |
+
+---
+
 ## API
 
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/health` | Health check |
-| POST | `/api/generate` | Create job; body: `topic`, `teamOrPlayer`, `eraOrMatch`, `tone`, `durationSec`, `stylePreset`; returns `{ jobId }` |
+| POST | `/api/generate` | Create job; body: `topic` (required), `category`, `teamOrPlayer`, `eraOrMatch`, `tone`, `durationSec`, `stylePreset`, optional `context`; returns `{ jobId }` |
 | GET | `/api/jobs` | List jobs |
-| GET | `/api/jobs/:id` | Job status + metadata + download URLs (triggers processing if pending) |
+| GET | `/api/jobs/:id` | Job status, `steps`, metadata, download URLs (triggers processing if pending) |
 | GET | `/api/jobs/:id/download` | Stream MP4 (attachment) |
 | GET | `/api/jobs/:id/asset/captions` | captions.json |
 | GET | `/api/jobs/:id/asset/srt` | subtitles.srt |
